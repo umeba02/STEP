@@ -33,7 +33,7 @@ int calculate_hash(string key)
     // hashを計算
     for (int i = 0; i < key.length(); i++)
     {
-        // 各文字のアスキーコードを足していく
+        // 各文字に割り当てた素数とインデックスをかける
         hash += prime_num[key[i]] * (i + 1);
     }
 
