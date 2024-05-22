@@ -1,7 +1,9 @@
-### week2
+# week2
 
-#### 宿題1
-- hash_table.py
+## 宿題1
+
+### hash_table.py
+
 - ハッシュ法でデータを格納する
   - calculate_hash
     - ハッシュ関数
@@ -27,7 +29,8 @@
   - performance_test
     - ハッシュテーブルのパフォーマンスをテストする関数
   
-- hash_table.cpp
+### hash_table.cpp
+
 - hash_table.pyをもとにC++でかいたもの
   - prime_num
     - 素数の配列
@@ -55,11 +58,53 @@
   - performance_test
     - ハッシュテーブルのパフォーマンスをテストする関数
 
-#### 宿題2
-- homework2.md
+## 宿題2
 
-#### 宿題3
-- homework3.md
+### homework2.md
 
-#### 宿題4
-- 着手途中
+## 宿題3
+
+### homework3.md
+
+## 宿題4
+
+### cache.cpp
+
+- cache.pyをもとにC++でかいたもの
+  - prime_num
+    - 素数の配列
+  - calculate_hash
+    - ハッシュ関数
+    - 各文字に割り当てた素数とインデックスをかける
+  - ItemListNode
+    - ハッシュテーブルに格納されている連結リスト
+  - HashTable
+    - ハッシュテーブルや追加、削除、検索機能などをまとめた構造体
+    - put
+      - ハッシュテーブルに要素を追加する関数
+    - get
+      - ハッシュテーブルの要素を検索する関数
+    - delete
+      - ハッシュテーブルの要素を削除する関数
+    - size
+      - ハッシュテーブル内のアイテム数を返す関数
+    - check_size
+      - ハッシュテーブルの大きさが規定内に収まっているか確認する関数
+    - change_size
+      - ハッシュテーブルの大きさを変更する関数
+  - Cache
+    - キャッシュの双方向連結リストや追加機能などをまとめた構造体
+    - put_new
+      - リストの先頭に新しい要素を追加する関数
+    - delete_old
+      - リストの一番後ろの要素を削除する関数
+    - move_top
+      - リストの既存の要素を先頭に持ってくる関数
+    - access_page
+      - ページにアクセスしたとき、キャッシュやハッシュテーブルにデータを格納する関数
+    - get_pages
+      - キャッシュの中身を返す関数
+  - check_pages
+    - ふたつのvectorが等しいか確認する関数
+  - cache_test
+    - キャッシュが動くかテストするための関数

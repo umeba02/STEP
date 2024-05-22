@@ -51,7 +51,7 @@ struct ItemListNode
 // ハッシュテーブル
 struct HashTable
 {
-    int bucket_size = 97;           // ハッシュテーブルのおおきさ
+    int bucket_size = 3;           // ハッシュテーブルのおおきさ
     int item_count = 0;             // ハッシュテーブルのアイテムの数？
     vector<ItemListNode *> buckets; // ハッシュテーブル
 
@@ -75,12 +75,9 @@ struct HashTable
         this->check_size();
         // ハッシュ値をもとに格納場所をきめる
         int bucket_index = calculate_hash(key) % this->bucket_size;
-        cout <<"bucket_index:"<<bucket_index<<endl;
 
         // ハッシュテーブルから格納場所を取得
         ItemListNode *item = this->buckets[bucket_index];
-        
-        cout << "item:" << item << endl;
 
         // アイテムをひとつずつ見ていき、keyがかぶってないか確認する
         while (item)
@@ -244,7 +241,7 @@ struct HashTable
             // 新しいハッシュテーブルを作成
             vector<ItemListNode *> new_buckets;
             new_buckets.resize(new_bucket_size);
-            new_buckets.clear();
+            //new_buckets.clear();
 
             // 旧ハッシュテーブルの中身をみていく
             for (int i = 0; i < this->bucket_size; i++)
@@ -275,13 +272,16 @@ struct HashTable
                 }
             }
 
+            // for(int i=0;i<new_bucket_size;i++){
+            //     cout << new_buckets[i]<<endl;
+            // }
+
             buckets.clear();
             buckets.shrink_to_fit();
 
             //更新
             this->bucket_size=new_bucket_size;
             this->buckets=new_buckets;
-            cout <<"new:"<<this->bucket_size<<endl;
         }
     }
 };
@@ -369,8 +369,7 @@ void performance_test()
             int rand = random_num() % 100000000;
 
             // ハッシュテーブルに格納
-            cout << hash_table->put(to_string(rand), rand) << endl;
-            cout << "j:" << j << endl;
+            hash_table->put(to_string(rand), rand);
         }
 
         // 乱数生成器
@@ -387,7 +386,7 @@ void performance_test()
 
         chrono::duration<double> time = end - start;
 
-        cout << i << " " << time.count();
+        cout << i << " " << time.count()<<endl;
     }
 
     for (int i = 0; i < 100; i++)
@@ -407,6 +406,6 @@ void performance_test()
 
 int main()
 {
-    // functional_test();
+    functional_test();
     performance_test();
 }
