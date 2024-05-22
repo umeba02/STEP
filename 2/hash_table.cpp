@@ -379,7 +379,7 @@ void performance_test()
             // 乱数を生成
             int rand = random_get_num() % 100000000;
             // ハッシュテーブルを検索
-            hash_table->put(to_string(rand), rand);
+            hash_table->get(to_string(rand));
         }
 
         auto end = chrono::system_clock::now();
