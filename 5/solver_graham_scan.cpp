@@ -1,11 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-// solver_greedy.pyをC++で書いてみる
-
-// 2-optsを限界までまわす
-// 更新されたかどうかを毎回保存しておく
-// 3optsも限界までまわす
-// やきなまし法をやってみる
+// solver_greedy.pyをC++で書いたものを改善する
 
 // 入力ファイルを読んで、各町の座標のvectorを返す関数
 vector<pair<double, double>> read_input(string filename)
@@ -70,7 +65,7 @@ double distance(pair<double, double> city1, pair<double, double> city2)
     return sqrt(pow((city1.first - city2.first), 2) + pow((city1.second - city2.second), 2));
 }
 
-// 辺を入れ替える
+// 辺を入れ替える関数
 vector<int> swap_edges(vector<int> tour, int a, int b, int c, int d)
 {
     // abを入れ替えればOK？
@@ -103,7 +98,7 @@ vector<int> two_opt(vector<int> tour, vector<vector<double>> dist)
     // 経路が更新されたかどうか
     bool is_update = false;
     // とりあえず100回まわす
-    int turns = 100;
+    int turns = 1000;
 
     // 全頂点を順に見る
     for (int count = 0; count < turns; count++)
@@ -113,6 +108,7 @@ vector<int> two_opt(vector<int> tour, vector<vector<double>> dist)
         {
             for (int j = i + 2; j < N; j++)
             {
+                // a-cとb-dが交差しているかみる
                 int a = i;
                 int b = j;
 
@@ -124,22 +120,38 @@ vector<int> two_opt(vector<int> tour, vector<vector<double>> dist)
                     continue;
                 }
 
+                // for (int k = 0; k < tour.size(); k++)
+                // {
+                //     cout << tour[k] << " ";
+                // }
+                // cout << endl;
+
+                // cout << "tour[b]:" << tour[b] << "tour[c]" << tour[c] << endl;
+
                 // 交換した方が短くなるのであれば交換する
                 if (dist[tour[a]][tour[b]] + dist[tour[c]][tour[d]] < dist[tour[a]][tour[c]] + dist[tour[b]][tour[d]])
                 {
                     // tour = swap_edges(tour, a, b, c, d);
-                    reverse(tour.begin() + c, tour.begin() + d);
+                    reverse(tour.begin() + c, tour.begin() + b + 1);
+                    // for (int k = 0; k < tour.size(); k++)
+                    // {
+                    //     cout << tour[k] << " ";
+                    // }
+                    // cout << endl;
+
+                    // 経路が更新されたのでtrueにする
                     is_update = true;
                 }
             }
         }
 
         if (!is_update)
-        {
+        { // 経路が未更新だったらおわり
             break;
         }
         else
-        {
+        { // そうでなければもう一回
+            // 初期化
             is_update = false;
         }
     }
@@ -155,7 +167,7 @@ pair<double, double> diff_pair(pair<int, int> p1, pair<int, int> p2)
     return make_pair(a, b);
 }
 
-// グラハムスキャン法で初期経路を生成
+// グラハムスキャン法で凸包を生成
 vector<int> graham_scan(vector<pair<double, double>> cities, vector<vector<double>> dist)
 {
     // 初期位置を決める
@@ -250,12 +262,14 @@ vector<int> graham_scan(vector<pair<double, double>> cities, vector<vector<doubl
     return tour;
 }
 
+// 辺と点との距離を計算する関数
 double tri_length(double p1, double p2, double pnew, vector<vector<double>> dist)
 {
     return dist[p1][pnew] + dist[p2][pnew] - dist[p1][p2];
 }
 
 // 挿入法
+// 凸包の各辺から最も近い未到達の頂点を凸包に加えていく...という処理を未到達の頂点がなくなるまで続ける
 vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> dist, vector<int> tour)
 {
     // 未到達の点をまとめる
@@ -299,10 +313,11 @@ vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> d
     }
     cout << "create length list:done" << endl;
 
+    // 未到達の頂点がなくなるまで回す
     while (!unvisited.empty())
     {
         cout << "unvisited size:" << unvisited.size() << endl;
-        // いいてんをさがす
+        // 最も近い頂点を探す
         for (int i = 0; i < tour.size(); i++)
         {
             for (int j = 0; j < unvisited.size(); j++)
@@ -329,6 +344,7 @@ vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> d
             break;
         }
 
+        // 距離の集合からも削除する
         for (int i = 0; i < lengths.size(); i++)
         {
             lengths[i].erase(lengths[i].begin() + best_node.second);
@@ -346,6 +362,7 @@ vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> d
         {
             new_index = best_node.first - 1;
         }
+
         // あたらしい辺との距離のvectorつくる
         for (int j = 0; j < unvisited.size(); j++)
         {
@@ -357,6 +374,7 @@ vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> d
         lengths.insert(lengths.begin() + new_index, new_vec);
 
         // あたらしい辺2でもおなじことをやる
+        //(1つ頂点を凸包に加えると、あたらしい辺が2つできる)
         // まず初期化
         new_vec.clear();
         if (best_node.first == tour.size())
@@ -386,6 +404,7 @@ vector<int> insert(vector<pair<double, double>> cities, vector<vector<double>> d
     return tour;
 }
 
+// TSPを解く
 vector<int> solve(vector<pair<double, double>> cities)
 {
     // まちの数を取得
@@ -408,7 +427,7 @@ vector<int> solve(vector<pair<double, double>> cities)
     // グラハムスキャン法で凸包を生成
     vector<int> tour = graham_scan(cities, dist);
     cout << "graham_scan done" << endl;
-    // 挿入法でなんかどうにかする
+    // 挿入法で凸包をもとに初期経路を生成する
     tour = insert(cities, dist, tour);
     cout << "insert done" << endl;
 
@@ -456,7 +475,9 @@ int main(int argc, char *argv[])
     // 引数が2つより大きいか確認
     assert(argc > 2);
 
+    // 経路を取得
     vector<int> tour = solve(read_input(argv[1]));
+    // 出力
     print_tour(tour, argv[2]);
 
     return 0;
