@@ -39,9 +39,9 @@ typedef struct my_metadata_t
 typedef struct my_heap_t
 {
   // freeリストの先頭の配列
-  my_metadata_t *free_head[4];
+  my_metadata_t *free_head[5];
   // ダミー
-  my_metadata_t dummy[4];
+  my_metadata_t dummy[5];
 } my_heap_t;
 
 //
@@ -59,21 +59,25 @@ my_heap_t my_heap;
 int calc_index(size_t size)
 {
   int index = 0;
-  if (size < 64)
+  if (size < 32)
   {
     index = 0;
   }
-  else if (size < 256)
+  else if (size < 128)
   {
     index = 1;
   }
-  else if (size < 1024)
+  else if (size < 512)
   {
     index = 2;
   }
-  else
+  else if (size < 2048)
   {
     index = 3;
+  }
+  else
+  {
+    index = 4;
   }
   return index;
 }
@@ -83,7 +87,7 @@ void print_free_bin()
 {
 
   my_metadata_t *metadata;
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 5; i++)
   {
     metadata = my_heap.free_head[i];
     while (1)
@@ -115,8 +119,8 @@ void my_add_to_free_list(my_metadata_t *metadata)
   int i = calc_index(metadata->size);
 
   // printf("before add i:%d size:%lu\n",i,my_heap.free_head[i]->size);
-  printf("before add\n");
-  print_free_bin();
+  // printf("before add\n");
+  // print_free_bin();
 
   // nextをmy_heapのfree_headにしてる...
   // 受け取った要素をfree_listの先頭にしてる？
@@ -126,15 +130,15 @@ void my_add_to_free_list(my_metadata_t *metadata)
   //  if(my_heap.free_head[i]->next){
   //   printf("??? i:%d size:%lu\n",i,my_heap.free_head[i]->next->size);
   //  }
-  printf("after add\n");
-  print_free_bin();
+  // printf("after add\n");
+  // print_free_bin();
 }
 
 // metadataをfree_listから取っ払っている？
 void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev)
 {
-  printf("before remove\n");
-  print_free_bin();
+  // printf("before remove\n");
+  // print_free_bin();
 
   // iをきめる
   int i = calc_index(metadata->size);
@@ -154,8 +158,8 @@ void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev)
   // metadataのnextをNULLにしている
   // 使用中のやつはnextがNULLになっている？
   metadata->next = NULL;
-  printf("after remove\n");
-  print_free_bin();
+  // printf("after remove\n");
+  // print_free_bin();
 }
 
 //
@@ -166,7 +170,7 @@ void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev)
 void my_initialize()
 { // 初期化
   // freelistの先頭をダミーにしてる
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 5; i++)
   {
     my_heap.free_head[i] = &my_heap.dummy[i];
     my_heap.dummy[i].size = 0;
@@ -201,9 +205,10 @@ void *my_malloc(size_t size)
 
   // freelistをひとつずつ見ていく
   // metadataの大きさが要求サイズ以上であれば止まる
-  for (int i = index; i < 4; i++)
+  for (int i = index; i < 5; i++)
   {
     metadata = my_heap.free_head[i];
+    prev = NULL;
 
     while (metadata)
     {
@@ -288,8 +293,23 @@ void *my_malloc(size_t size)
     // ここでbinに入れた空き領域のサイズが更新されて、
     // binにいれたいサイズの幅と一致しなくなっている？
     // ここでなんでsizeを更新するのかはよくわからない
-    metadata->size = size;
-    print_free_bin();
+
+    // printf("before resize\n");
+    // print_free_bin();
+
+    if (calc_index(metadata->size) < index)
+    {
+      my_remove_from_free_list(metadata, prev);
+      metadata->size = size;
+      my_add_to_free_list(metadata);
+    }
+    else
+    {
+      metadata->size = size;
+    }
+    // printf("after resize\n");
+    // print_free_bin();
+
     // Create a new metadata for the remaining free slot.
     //
     // ... | metadata | object | metadata | free slot | ...
@@ -336,14 +356,14 @@ void my_finalize()
 void test()
 {
   // Implement here!
-  my_initialize();
-  print_free_bin();
-  void *ptr = (my_malloc(400));
-  printf("malloc done\n");
-  print_free_bin();
-  printf("free start\n");
-  my_free(ptr);
-  printf("free done\n");
-  print_free_bin();
+  // my_initialize();
+  // print_free_bin();
+  // void *ptr = (my_malloc(400));
+  // printf("malloc done\n");
+  // print_free_bin();
+  // printf("free start\n");
+  // my_free(ptr);
+  // printf("free done\n");
+  // print_free_bin();
   assert(1 == 1); /* 1 is 1. That's always true! (You can remove this.) */
 }
